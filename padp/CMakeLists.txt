@@ -11,4 +11,5 @@ link_libraries(OpenMP::OpenMP_CXX)
 add_executable(padp00 src/00/main.cpp)
 add_executable(padp00_reductionism src/00/reductionism.cpp)
 add_executable(padp20_matmul src/20/main.cpp)
+add_executable(padp10_area src/10/area.cpp)
 
