@@ -4,13 +4,12 @@
 #include <stdlib.h>
 
 int main() {
-    unsigned int inside = 0, i = 0,n=0;
+    unsigned int inside = 0, i = 0,n=10000000;
     double x,y,dist;
     srand(0);
-    printf("Enter iterations\n:");
-    scanf("%d",&n);                     // number input
+                      // number input
 
-    #pragma omp parallel for num_threads(2) private(x,y,dist)
+    #pragma omp parallel for num_threads(1) private(x,y,dist) reduction(+:inside)
     for (i = 0; i < n; i++) {
         x = (double)rand() / RAND_MAX;
         y = (double)rand() / RAND_MAX;
@@ -18,7 +17,6 @@ int main() {
         dist = x * x + y * y;           //dist calc
 
         if (dist <= 1) {
-            #pragma omp atomic
             inside++;
         }
     }
