@@ -1,31 +1,27 @@
 // find the value of pi
 #include <iostream>
 #include <omp.h>
-// #include<random>
 #include <stdlib.h>
-int halfrand = RAND_MAX >> 1;
-int main()
-{
 
-    int outside = 0, inside = 0,i=0;
+int main() {
+    unsigned int inside = 0, i = 0,n=0;
+    double x,y,dist;
     srand(0);
-#pragma omp parallel for num_threads(4) private(i)
-    for (i = 0; i < 1<<30; i++) {
-        unsigned int r1 = rand();
-        unsigned int r2 = rand();
-        double x = ((double)r1 - halfrand) / (halfrand);
-        double y = ((double)r2 - halfrand) / (halfrand);
-        double dist = x * x + y * y;
-        // std::cout<<r1<<' '<<r2<<' '<<"dist"<<dist<<"\n";
-        
-        if (dist > 1) {
-            #pragma omp atomic
-            outside++;
-        } else {
+    printf("Enter iterations\n:");
+    scanf("%d",&n);                     // number input
+
+    #pragma omp parallel for num_threads(2) private(x,y,dist)
+    for (i = 0; i < n; i++) {
+        x = (double)rand() / RAND_MAX;
+        y = (double)rand() / RAND_MAX;
+
+        dist = x * x + y * y;           //dist calc
+
+        if (dist <= 1) {
             #pragma omp atomic
             inside++;
         }
     }
-
-    std::cout<<"Counts:"<<inside<<' '<<outside+inside<<' '<<(4.0f*inside)/(outside+inside)<<'\n';
+    unsigned int outside = n-inside;
+    std::cout << "Counts:" << inside << " / " << n << ' ' << (4.0L * inside) / (n) << '\n';
 }
