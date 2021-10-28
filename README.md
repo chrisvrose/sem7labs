@@ -7,7 +7,12 @@ This is a big Cmake Project. Cmake FTW.
 
 ## CG
 
-The CG Folder is a big MSVC 2019 Solution. 
+The folder consists of individual MSVC (2019) Solutions (and projects). To make another, copy and paste. _Much easier than doing the below instructions by hand_. 
+
+### Instructions to create a MSVC Project
+
+~~Less of instructions and more of reminder tbh~~
+
 To create a new project under the solution:
 1. Set the include paths, adding:
 ```
