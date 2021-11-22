@@ -1,4 +1,3 @@
-// cache unfriendly sieve
 #include <iostream>
 #include <math.h>
 #include <omp.h>
@@ -30,6 +29,7 @@ void SieveOfEratosthenes(int n, bool* prime)
 int main(int, char**)
 {
     int n;
+
     // get n from env
     char* ptr=getenv("ARR_SIZE");
     if(ptr){
@@ -40,15 +40,13 @@ int main(int, char**)
        std::cout << "Set ARR_SIZE, defaults to 100000\n"; 
     }
 
-    // std::cout << "Enter upper bound\n";
-    // std::cin >> n;
     // Create a boolean array
     // "prime[0..n]" and initialize
     // all entries it as true.
     // A value in prime[i] will
     // finally be false if i is
     // Not a prime, else true.
-    bool prime[n + 1];
+    bool* prime = new bool[n+1];
     std::fill(prime, prime + n, true);
 
     auto t1 = omp_get_wtime();

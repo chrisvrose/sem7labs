@@ -15,3 +15,7 @@ add_executable(padp10_area src/10/area.cpp)
 # this is the measurement version
 add_executable(padp10_area_measure src/10/areameasure.cpp)
 
+
+add_executable(padp_40_cfe src/40/cfe.cpp)
+add_executable(padp_40_cnfe src/40/cnfe.cpp)
+
