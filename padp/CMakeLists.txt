@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(sem7padp VERSION 0.1.0)
+project(sem7padp_openmp VERSION 0.1.0)
 
 find_package(OpenMP REQUIRED)
 
@@ -16,6 +16,17 @@ add_executable(padp10_area src/10/area.cpp)
 add_executable(padp10_area_measure src/10/areameasure.cpp)
 
 
-add_executable(padp_40_cfe src/40/cfe.cpp)
-add_executable(padp_40_cnfe src/40/cnfe.cpp)
+add_executable(padp_30_cfe src/30/cfe.cpp)
+add_executable(padp_30_cnfe src/30/cnfe.cpp)
+
+
+project(sem7padp_openmp_gd VERSION 0.1.0)
+
+find_package(OpenMP REQUIRED)
+
+link_libraries(OpenMP::OpenMP_CXX)
+link_libraries(gd)
+
+
+add_executable(padp_40_gray src/40/grayscale.cpp)
 
