@@ -5,7 +5,7 @@
 #else
 #include <CL/cl.h>
 #endif
-#define VECTOR_SIZE 65536
+// #define VECTOR_SIZE 65536
 
 // OpenCL kernel which is run for every work item created.
 const char* saxpy_kernel = "__kernel                                  "
@@ -19,9 +19,10 @@ const char* saxpy_kernel = "__kernel                                  "
                            "    C[index] = alpha* A[index] + B[index];"
                            "}                                         ";
 
-int main(int,char**)
+int main(int argc,char** argv)
 {
-    int i;
+    int i;if(argc!=3) {printf("Need 2 args\n");return 1;}
+    unsigned int VECTOR_SIZE = atoi(argv[1]);size_t local_size=atoi(argv[2]);
     // Allocate space for vectors A, B and C
     float alpha = 2.0;
     float* A = (float*)malloc(sizeof(float) * VECTOR_SIZE);
@@ -86,7 +87,7 @@ int main(int,char**)
 
     // Execute the OpenCL kernel on the list
     size_t global_size = VECTOR_SIZE; // Process the entire lists
-    size_t local_size = 64; // Process one item at a time
+    // size_t local_size = 64; // Process one item at a time
     cl_event event; // event listener
     clStatus = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, &event);
 
@@ -109,10 +110,10 @@ int main(int,char**)
     #pragma endregion
 
     // Display the result to the screen
-    for (i = 0; i < VECTOR_SIZE; i++)
-        printf("%f * %f + %f = %f\n", alpha, A[i], B[i], C[i]);
+    // for (i = 0; i < VECTOR_SIZE; i++)
+    //     printf("%f * %f + %f = %f, ", alpha, A[i], B[i], C[i]);
 
-    printf("OpenCl Execution time is: %0.3f milliseconds \n", nanoSeconds / 1000000.0);
+    printf("\nOpenCl Execution time is: %0.3f milliseconds \n", nanoSeconds / 1000000.0);
 
     // Finally release all OpenCL allocated objects and host buffers.
     clStatus = clReleaseKernel(kernel);

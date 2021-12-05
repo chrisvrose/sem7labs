@@ -1,0 +1,61 @@
+❯ for i in {1024,2048,65536,131072,262144}; do for j in {32,64,128,256}; do echo "$i,$j" && ./build/padp_ocl "$i" "$j"; done;done
+1024,32
+
+OpenCl Execution time is: 0.028 milliseconds 
+1024,64
+
+OpenCl Execution time is: 0.012 milliseconds 
+1024,128
+
+OpenCl Execution time is: 0.009 milliseconds 
+1024,256
+
+OpenCl Execution time is: 0.011 milliseconds 
+2048,32
+
+OpenCl Execution time is: 0.240 milliseconds 
+2048,64
+
+OpenCl Execution time is: 0.009 milliseconds 
+2048,128
+
+OpenCl Execution time is: 0.013 milliseconds 
+2048,256
+
+OpenCl Execution time is: 0.012 milliseconds 
+65536,32
+
+OpenCl Execution time is: 0.081 milliseconds 
+65536,64
+
+OpenCl Execution time is: 0.062 milliseconds 
+65536,128
+
+OpenCl Execution time is: 0.117 milliseconds 
+65536,256
+
+OpenCl Execution time is: 0.073 milliseconds 
+131072,32
+
+OpenCl Execution time is: 0.073 milliseconds 
+131072,64
+
+OpenCl Execution time is: 0.065 milliseconds 
+131072,128
+
+OpenCl Execution time is: 0.066 milliseconds 
+131072,256
+
+OpenCl Execution time is: 0.064 milliseconds 
+262144,32
+
+OpenCl Execution time is: 0.140 milliseconds 
+262144,64
+
+OpenCl Execution time is: 0.123 milliseconds 
+262144,128
+
+OpenCl Execution time is: 0.124 milliseconds 
+262144,256
+
+OpenCl Execution time is: 0.123 milliseconds
