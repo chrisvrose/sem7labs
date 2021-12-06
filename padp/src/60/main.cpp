@@ -2,7 +2,7 @@
 #include <iostream>
 #include <omp.h>
 #include <string>
-#define FN "words.txt"
+// #define FN "words.txt"
 
 #define COUNT 8
 char search_words[COUNT + 1][32] = { "The", "lorem", "ipsum", "present", "dolor", "sit", "in","quid", "" };
@@ -31,7 +31,7 @@ void read_word(char* temp, FILE* fp)
     temp[i] = '\0';
 }
 
-long determine_count(const char* file_name, const char* key, int ignore_case)
+long determine_count(char* file_name, const char* key, int ignore_case)
 {
     int key_index = 0, key_len = strlen(key);
     long word_count = 0;
@@ -48,19 +48,11 @@ long determine_count(const char* file_name, const char* key, int ignore_case)
     return word_count;
 }
 
-// int main(int, char**)
-// {
-//     auto t = omp_get_wtime();
-
-//     t = omp_get_wtime() - t;
-
-//     std::cout << "time:" << t << std::endl;
-// }
-
-int main(int, char**)
+int main(int argc, char** argv)
 {
     int i, nt = 0, ignore_case = 1;
     char choice, buf;
+    if(argc<2){printf("No args\n");return 1;}char* FN = argv[1];
     for (nt = 1; nt <= 16; nt *= 2) {
         omp_set_num_threads(nt);
         for (i = 0; i < COUNT; i++) {
