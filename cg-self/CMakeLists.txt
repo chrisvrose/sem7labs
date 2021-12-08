@@ -10,3 +10,5 @@ link_libraries( ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
 
 add_executable(p01 src/01/main.cpp)
 add_executable(p02 src/02/main.cpp)
+add_executable(p04 src/04/main.cpp)
+add_executable(p06 src/06/main.cpp)
