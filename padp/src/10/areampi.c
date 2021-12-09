@@ -31,7 +31,7 @@ int main(int argc, char** argv)
                 count++; //if it is, consider it a valid random point
             }
         }
-        for (i = 0; i < nodenum; ++i) {
+        // for (i = 0; i < nodenum; ++i) {
             MPI_Send(&count,
                 1,
                 MPI_INT,
@@ -44,9 +44,9 @@ int main(int argc, char** argv)
                 0,
                 2,
                 MPI_COMM_WORLD);
-        }
+        // }
     } else if (myid == 0) {
-        for (i = 0; i < nodenum; ++i) {
+        for (i = 1; i < nodenum; ++i) {
             MPI_Recv(&recieved[i],
                 nodenum,
                 MPI_INT,
@@ -61,6 +61,7 @@ int main(int argc, char** argv)
                 2,
                 MPI_COMM_WORLD,
                 MPI_STATUS_IGNORE);
+                printf("Received %d/%ld",recieved[i],recvniter[i]);
         }
     }
 
@@ -68,7 +69,7 @@ int main(int argc, char** argv)
     {
         int finalcount = 0;
         long finalniter = 0;
-        for (i = 0; i < nodenum; ++i) {
+        for (i = 1; i < nodenum; ++i) {
             finalcount += recieved[i];
             finalniter += recvniter[i];
         }

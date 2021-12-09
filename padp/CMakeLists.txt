@@ -18,6 +18,7 @@ add_executable(padp10_area_measure src/10/areameasure.cpp)
 
 add_executable(padp_30_cfe src/30/cfe.cpp)
 add_executable(padp_30_cnfe src/30/cnfe.cpp)
+add_executable(padp_30_combined src/30/main.cpp)
 
 
 add_executable(padp_60_ws src/60/main.cpp)
