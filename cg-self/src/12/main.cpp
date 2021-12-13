@@ -81,7 +81,7 @@ void idle() {
     glutPostRedisplay();
 }
 
-void myinit() {
+inline void myinit() {
     glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
