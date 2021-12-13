@@ -6,7 +6,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} )
-link_libraries( ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+link_libraries( ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} )
 
 add_executable(p01 src/01/main.cpp)
 add_executable(p02 src/02/main.cpp)
