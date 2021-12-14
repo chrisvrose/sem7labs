@@ -154,7 +154,7 @@ void display()
 int main(int argc, char* argv[])
 {
 	printf("Enter no. of vertices: \n");
-	scanf_s("%d", &poly_size);
+	scanf("%d", &poly_size);
 	org_poly_size = poly_size;
 	for (int i = 0; i < poly_size; i++)
 	{
