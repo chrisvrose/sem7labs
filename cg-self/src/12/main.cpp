@@ -1,5 +1,5 @@
 #include <GL/glut.h>
-
+/** Vertices of a coob */
 float vertices[8][3] = {-1,   -1,   -1,
 
                         1, -1,   -1,
@@ -15,7 +15,7 @@ float vertices[8][3] = {-1,   -1,   -1,
                         1, -1,   1,
 
                         -1,   -1,   1};
-
+/** Colors of each vertex of a coob */
 float colors[8][3] = {0, 0, 0,
 
                         1, 0, 0,
