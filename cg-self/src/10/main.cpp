@@ -159,17 +159,17 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < poly_size; i++)
 	{
 		printf("Polygon Vertex:\n");
-		scanf_s("%d%d", &poly_points[i][0], &poly_points[i][1]);
+		scanf("%d%d", &poly_points[i][0], &poly_points[i][1]);
 		org_poly_points[i][0] = poly_points[i][0];
 		org_poly_points[i][1] = poly_points[i][1];
 	}
 
 	printf("Enter no. of vertices of clipping window:");
-	scanf_s("%d", &clipper_size);
+	scanf("%d", &clipper_size);
 	for (int i = 0; i < clipper_size; i++)
 	{
 		printf("Clip Vertex:\n");
-		scanf_s("%d%d", &clipper_points[i][0], &clipper_points[i][1]);
+		scanf("%d%d", &clipper_points[i][0], &clipper_points[i][1]);
 	}
 
 	glutInit(&argc, argv);
