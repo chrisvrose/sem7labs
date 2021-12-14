@@ -1,20 +1,20 @@
 #include <GL/glut.h>
 
-float vertices[8][3] = {0,   0,   0,
+float vertices[8][3] = {-1,   -1,   -1,
 
-                        250, 0,   0,
+                        1, -1,   -1,
 
-                        250, 250, 0,
+                        1, 1, -1,
 
-                        0,   250, 0,
+                        -1,   1, -1,
 
-                        0,   250, 250,
+                        -1,   1, 1,
 
-                        250, 250, 250,
+                        1, 1, 1,
 
-                        250, 0,   250,
+                        1, -1,   1,
 
-                        0,   0,   250};
+                        -1,   -1,   1};
 
 float colors[8][3] = {0, 0, 0,
 
@@ -33,7 +33,7 @@ float colors[8][3] = {0, 0, 0,
                         0, 0, 1};
 
 // use GLubyte **OR** unsigned char
-GLubyte elementindices[24] = {
+GLubyte elementindices[] = {
     0,1,2,3,
 
     0,3,4,7,
@@ -61,7 +61,6 @@ inline void drawCube() {
      * 4. index list
      */
     glDrawElements(GL_QUADS,24,GL_UNSIGNED_BYTE,elementindices);
-    glFlush();
 }
 
 void disp() {
@@ -88,14 +87,14 @@ inline void myinit() {
     glLoadIdentity();
     // perspective op
     // just pass fov, aspect ratio (just keep it 1 if square), and near and far
-    gluPerspective(90, 1, .1, 2000.f);
+    gluPerspective(80, 1, .1, 15.f);
 
 
 
 
     glMatrixMode(GL_MODELVIEW);
     // move the cube a bit away
-    glTranslated(0, 0, -800);
+    glTranslated(0, 0, -6);
 }
 
 int main(int argc, char** argv) {
@@ -116,12 +115,12 @@ int main(int argc, char** argv) {
      * Explaining this - We are passing a set of triplets to OpenGL 
      * 1. Size of the ntuple - 3 -> x, y and z coordinate
      * 2. Datatype
-     * 3. Stride - The gap between two successive elements - *3* elements, or *0* for OpenGL to autodetect it
+     * 3. Stride - The gap between two successive elements - *3* elements(floats), or *0* for OpenGL to autodetect it
      *  (Stride is important if your array contains other data that you're passing at once)
      * 4. The actual data
      */
-    glVertexPointer(3,GL_FLOAT,3,vertices);
-    glColorPointer(3,GL_FLOAT,3,colors);
+    glVertexPointer(3,GL_FLOAT,3*sizeof(float),vertices);
+    glColorPointer(3,GL_FLOAT,3*sizeof(float),colors);
 
     myinit();
 
