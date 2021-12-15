@@ -3,9 +3,9 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
-typedef double vec2[2];
+
 using namespace std;
-int h=50,k=50,r=40;
+
 std::vector<int> x;
 std::vector<int> y;
 std::vector<int> xint;
