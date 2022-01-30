@@ -35,20 +35,13 @@ link_libraries(gd)
 add_executable(padp_40_gray src/40/grayscale.cpp)
 
 
-project(sem7padp_ocl_comp VERSION 0.1.0)
-
-find_package(OpenMP REQUIRED)
-
-link_libraries(OpenMP::OpenMP_CXX)
-
-add_executable(padp_70_ocl_cmp_test src/70/test.cpp)
-
-
 project(sem7padp_ocl VERSION 0.1.0)
 
 find_package(OpenCL REQUIRED)
 link_directories(${OpenCL_LIBRARY})
 
 add_executable (padp_ocl src/70/ocl.cpp)
+add_executable (padp_ocl_simpler src/70/oclsimpler.cpp)
 target_link_libraries (padp_ocl ${OpenCL_LIBRARY})
+target_link_libraries (padp_ocl_simpler ${OpenCL_LIBRARY})
 # target_include_directories(padp_ocl ${OpenCL_INCLUDE_DIRS})
