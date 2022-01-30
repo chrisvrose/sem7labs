@@ -37,7 +37,7 @@ int main(int argc,char** argv)
     // Set up the Platform
     cl_int clstat = clGetPlatformIDs(0, NULL, &num_platforms);
     platforms = (cl_platform_id*)
-        malloc(sizeof(cl_platform_id) * num_platforms);
+        calloc(num_platforms,sizeof(cl_platform_id));
     clstat = clGetPlatformIDs(num_platforms, platforms, NULL);
 
     // Get the devices list and choose the device you want to run on
@@ -46,7 +46,7 @@ int main(int argc,char** argv)
 
     clstat = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, 0, NULL, &num_devices);
     device_list = (cl_device_id*)
-        malloc(sizeof(cl_device_id) * num_devices);
+        calloc(num_devices,sizeof(cl_device_id));
     clstat = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, num_devices, device_list, NULL);
 
     // Create one OpenCL context for each device in the platform
@@ -97,8 +97,8 @@ int main(int argc,char** argv)
     
 
     // Display the result to the screen
-    // for (i = 0; i < VECTOR_SIZE; i++)
-    //     printf("%f * %f + %f = %f, ", alpha, A[i], B[i], C[i]);
+    for (i = 0; i < VECTOR_SIZE; i++)
+        printf("%f * %f + %f = %f,\n", alpha, A[i], B[i], C[i]);
 
 
     // Finally release all OpenCL allocated objects and host buffers.
