@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.json": "jsonc",
+        "*.rmd": "markdown",
+        "iostream": "cpp"
+    }
+}
