@@ -1,89 +1,65 @@
-#include <stdlib.h>
-#include <algorithm>
-#include <iostream>
-#include <GL/glut.h>
+#include<GL/glut.h>
+#include<iostream>
+#include<vector>
+#include<algorithm>
+using namespace std;
 
-int m, n;
-int wx = 500, wy = 500;
-static float intx[10] = { 0 };
-float x[100], y[100];
+vector<int> x;
+vector<int> y;
+vector<int> xint;
 
-void drawLine(float x1, float y1, float x2, float y2)
-{
-	// sleep(1000);
-	glColor3f(0, 0, 1);
+void edgeDetect(int x0,int y0,int x1,int y1,int sl){
+	if(y0>y1) {
+		swap(x0,x1);swap(y0,y1);
+	}
+	if(y0==y1) return ;
+	if(y0<=sl&&sl<=y1){
+		xint.push_back(x0+(sl-y0)*(x1-x0)/(y1-y0));
+	}
+}
+
+void display(){
+	glClear(GL_COLOR_BUFFER_BIT);
 	glBegin(GL_LINES);
-	glVertex2f(x1, y1);
-	glVertex2f(x2, y2);
+	for(int sl=0;sl<500;sl++){
+		int n = x.size();
+		xint.clear();
+		for(int i=0;i<n;i++){
+			edgeDetect(x[i],y[i],x[(i+1)%n],y[(i+1)%n],sl);
+		}
+		int m = xint.size();
+		sort(xint.begin(),xint.end());
+		for(int i=0;i<m/2;i++){
+			glVertex2i(xint[2*i],sl);
+			glVertex2i(xint[2*i+1],sl);
+		}
+	}
 	glEnd();
 	glFlush();
 }
 
-void edgeDetect(float x1, float y1, float x2, float y2, int scanline)
-{
-	float temp;
-	if (y2 < y1)
-	{
-		temp = x1;
-		x1 = x2;
-		x2 = temp;
-		temp = y1;
-		y1 = y2;
-		y2 = temp;
+int main(int c, char**v){
+	glutInit(&c,v);
+	cout << "Enter #verts\n";
+	int n;
+	cin >> n;
+	cout << "Enter verts\n";
+	int temp;
+	for (int i = 0; i < n; i++) {
+		cin >> temp; x.push_back(temp);
+		cin >> temp; y.push_back(temp);
 	}
-	if (scanline > y1 && scanline < y2)
-		intx[m++] = x1 + (scanline - y1) * (x2 - x1) / (y2 - y1);
-}
 
-void scanFill(float x[], float y[])
-{
-	for (int s1 = 0; s1 <= wy; s1++)
-	{
-		m = 0;
-		for (int i = 0; i < n; i++)
-			edgeDetect(x[i], y[i], x[(i + 1) % n], y[(i + 1) % n], s1);
-		std::sort(intx, (intx + m));
-		if (m >= 2)
-		{
-			for (int i = 0; i < m; i =i + 2)
-				drawLine(intx[i], s1, intx[i + 1], s1);
-		}
-	}
-}
-
-void displayFilledPolygon()
-{
-	glClear(GL_COLOR_BUFFER_BIT);
-	glLineWidth(2);
-	glBegin(GL_LINE_LOOP);
-	for (int i = 0; i < n; i++)
-		glVertex2f(x[i], y[i]);
-	glEnd();
-	scanFill(x, y);
-}
-
-void myInit()
-{
-	glClearColor(1, 1, 1, 1);
-	glColor3f(1, 0, 0);
-	glPointSize(2);
-	gluOrtho2D(0, wx, 0, wy);
-}
-
-int main(int argc, char** argv)
-{
-	glutInit(&argc, argv);
-	std::cout << "Enter the number of sides : ";
-	std::cin >> n;
-	std::cout << "Enter the coordinates of vertices : \n";
-	for (int i = 0; i < n; i++)
-	{
-		std::cin >> x[i] >> y[i];
-	}
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_RGB);
 	glutInitWindowSize(500, 500);
-	glutCreateWindow("ScanLine fill polygon");
-	glutDisplayFunc(displayFilledPolygon);
-	myInit();
+
+	glutCreateWindow("");
+
+	glutDisplayFunc(display);
+	glClearColor(0,0,0,1);
+	
+	glMatrixMode(GL_PROJECTION);
+	gluOrtho2D(0, 499, 0, 499);
 	glutMainLoop();
+	return 0;
 }
