@@ -23,9 +23,7 @@ int main(int argc,char** argv)
     unsigned int VECTOR_SIZE = atoi(argv[1]);size_t local_size=atoi(argv[2]);
     // Allocate space for vectors A, B and C
     float alpha = 2.0;
-    float* A = (float*)calloc(VECTOR_SIZE,sizeof(float));
-    float* B = (float*)calloc(VECTOR_SIZE,sizeof(float));
-    float* C = (float*)calloc(VECTOR_SIZE,sizeof(float));
+    float *A = (float*)calloc(VECTOR_SIZE,sizeof(float)),*B = (float*)calloc(VECTOR_SIZE,sizeof(float)),*C = (float*)calloc(VECTOR_SIZE,sizeof(float));
     for (i = 0; i < VECTOR_SIZE; i++) {
         A[i] = i;
         B[i] = VECTOR_SIZE - i;
@@ -35,10 +33,11 @@ int main(int argc,char** argv)
     cl_platform_id* platforms = NULL;
     cl_uint num_platforms;
     // Set up the Platform
-    cl_int clstat = clGetPlatformIDs(0, NULL, &num_platforms);
-    platforms = (cl_platform_id*)
-        calloc(num_platforms,sizeof(cl_platform_id));
-    clstat = clGetPlatformIDs(num_platforms, platforms, NULL);
+    cl_int clstat=0;
+    //  = clGetPlatformIDs(0, NULL, &num_platforms);
+    // platforms = (cl_platform_id*)
+    //     calloc(num_platforms,sizeof(cl_platform_id));
+    // clstat = clGetPlatformIDs(num_platforms, platforms, NULL);
 
     // Get the devices list and choose the device you want to run on
     cl_device_id* device_list = NULL;
@@ -53,7 +52,6 @@ int main(int argc,char** argv)
     cl_context context = clCreateContext(NULL, num_devices, device_list, NULL, NULL, &clstat);
 
     // Create a command queue
-    // cl_queue_properties clQueueOpts[] = { CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0 };
 
     cl_command_queue cmd_queue = clCreateCommandQueueWithProperties(context, device_list[0], NULL, &clstat);
 
