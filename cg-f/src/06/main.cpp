@@ -4,6 +4,7 @@
 #include "GL/glut.h"
 #include<math.h>
 
+typedef float vec3[3];
 // sphere radius
 #define SPR 75
 // degrees to pi conversion factor
@@ -11,83 +12,73 @@
 // coordinates function macro
 #define SPHERE_GA(p1,p2) {SPR*sin(DPI*(p1))*cos(DPI*(p2)),SPR*cos(DPI*(p1))*cos(DPI*(p2)),SPR*sin(DPI*(p2))}
 
-
-void displayLoop() {
-	//glClearColor(0, 0, 0, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// glColor4f(1.f, 1.f, 1.f, 1.f);
-
-	//0 - > 70
-	// float c0=.1f;
-	for(int i=-80;i<80;i+=10){
-		
+void draw(){
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	for(int p=-80;p<80;p+=10){
 		glBegin(GL_QUAD_STRIP);
-		for(int thet=-180;thet<=180;thet+=10){
-			// glColor3f(c0,c0,c0);c0+=.00125;
-            glColor3f(1,1,1);
-			float p1[3] = SPHERE_GA(thet,i);
-			glVertex3fv(p1);
-            glColor3f(.8f,.8f,.8f);
-
-			float p2[3] = SPHERE_GA(thet,i+10);
-			glVertex3fv(p2);
+		for(int t=-180;t<=180;t+=10){
+			vec3 p1 = SPHERE_GA(t,p),p2=SPHERE_GA(t,p+10);
+			glColor3f(1,0,0);glVertex3fv(p1);
+			glColor3f(0,1,0);glVertex3fv(p2);
 		}
 		glEnd();
 	}
 
 
-	//north cap
+	vec3 nc = SPHERE_GA(0,90),sc=SPHERE_GA(0,-90);
+
+	//nc
 	glBegin(GL_TRIANGLE_FAN);
 	glColor3f(1,0,0);
-	glVertex3f(0,0,SPR);
+	glVertex3fv(nc);
 
-	for(int thet=-180;thet<=180;thet+=10){
-		// glColor3f((thet+180)/360,.25,.25);
-		float p1[3] = SPHERE_GA(thet,80);
+	glColor3f(1,1,0);
+	for(int t=-180;t<=180;t+=10){
+		vec3 p1 = SPHERE_GA(t,80);
 		glVertex3fv(p1);
 	}
+
 	glEnd();
 
-	//south cap
+	//sc	
 	glBegin(GL_TRIANGLE_FAN);
-	glColor3f(0,1,0);
-	glVertex3f(0,0,-SPR);
-	
-	for(int thet=-180;thet<=180;thet+=10){
-		// glColor3f((thet+180)/360,.25,.25);
-		float p1[3] = SPHERE_GA(thet,-80);
+	glColor3f(1,0,0);
+	glVertex3fv(sc);
+
+	glColor3f(1,1,0);
+	for(int t=-180;t<=180;t+=10){
+		vec3 p1 = SPHERE_GA(t,-80);
 		glVertex3fv(p1);
 	}
 
-	glEnd();
-	
-	glFlush();
-
+	glEnd();glFlush();
 }
 
-int main(int argc, char** argv) {
-	std::cout << "Hello world" << std::endl;
-	glutInit(&argc, argv);
-	//single buffer+rgb+depth
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-	int w = 800,h=600;
-	glutInitWindowSize(w, h);
-	glutCreateWindow("Send help");
+void idle(){
+	glRotatef(.01,1,1,1);
+	glutPostRedisplay();
+}
 
-	glutDisplayFunc(displayLoop);
-	// 3d depth test
+void myinit(){
 	glEnable(GL_DEPTH_TEST);
-
-	glClearColor(0, 0, 0, 1.f);
-	// set up how the camera will look like
+	glClearColor(0,0,0,1);
 	glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-	// glFrustum(-w/2,w/2,-h/2,h/2,.1,2000);
-    gluPerspective(120,((float)w)/h,.1,1000);
+	gluPerspective(90,1,.1,150);
 	glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();glTranslatef(0,0,-100);
-    // glRotatef(-20,1,0,0);
-    glRotatef(-20,0,1,0);
+	glTranslatef(0,0,-110);
+
+	
+}
+
+int main(int c, char** v) {
+	glutInit(&c, v);
+
+	glutInitDisplayMode(GLUT_RGB|GLUT_DEPTH);
+	glutInitWindowSize(400,400);
+	glutCreateWindow("-");
+	myinit();
+	glutDisplayFunc(draw);
+	glutIdleFunc(idle);
 	glutMainLoop();
+	return 0;
 }
