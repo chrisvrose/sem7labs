@@ -1,111 +1,96 @@
+//house ref and scaling
 #include <GL/glut.h>
 #include <math.h>
-#include <stdio.h>
+#include <iostream>
+typedef float vec2[2];
 
-// RIGHT CLICK TO SHOW REFLECTED HOUSE
+float m,c,t,xr,yr;
 
-float house[11][2] = {{100, 200}, {200, 250}, {300, 200}, {100, 200},
-                      {100, 100}, {175, 100}, {175, 150}, {225, 150},
-                      {225, 100}, {300, 100}, {300, 200}};
-int angle;
-float m, c, theta;
-void display() {
-    glClearColor(1, 1, 1, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(-450, 450, -450, 450);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    // NORMAL HOUSE
-    glColor3f(1, 0, 0);
+vec2 house[11] = {
+    {100,100},
+    {140,100},
+    {140,150},
+    {160,150},
+    {160,100},
+    {200,100},
+    {200,200},
+    {220,200},
+    {150,300},
+    {80,200},
+    {100,200},
+};
+
+void drawhouse(){
     glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 11; i++)
-        glVertex2fv(house[i]);
+    for(auto v:house){glVertex2fv(v);}
     glEnd();
-    glFlush();
-    // ROTATED HOUSE
+}
+
+void drawusual(){
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1,0,0);drawhouse();glFlush();
+    
+}
+
+void drawrefl(){
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1,0,0);drawhouse();
+
+
+    float r = atan(m)*180/3.1415f;
     glPushMatrix();
-    glTranslatef(100, 100, 0);
-    glRotatef(angle, 0, 0, 1);
-    glTranslatef(-100, -100, 0);
-    glColor3f(1, 1, 0);
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 11; i++)
-        glVertex2fv(house[i]);
-    glEnd();
-    glPopMatrix();
-    glFlush();
-}
-void display2() {
-    glClearColor(1, 1, 1, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(-450, 450, -450, 450);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    // normal house
-    glColor3f(1, 0, 0);
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 11; i++)
-        glVertex2fv(house[i]);
-    glEnd();
-    glFlush();
-    // line
-    float x1 = 0, x2 = 500;
-    float y1 = m * x1 + c;
-    float y2 = m * x2 + c;
-    glColor3f(1, 1, 0);
-    glBegin(GL_LINES);
-    glVertex2f(x1, y1);
-    glVertex2f(x2, y2);
-    glEnd();
-    glFlush();
+    glTranslatef(0,c,0);
+    glRotatef(r,0,0,1);
+    glScalef(1,-1,1);
+    glRotatef(-r,0,0,1);
+    glTranslatef(0,-c,0);
 
-    // Reflected
-    glPushMatrix();
-    glTranslatef(0, c, 0);
-    theta = atan(m);
-    theta = theta * 180 / 3.14;
-    glRotatef(theta, 0, 0, 1);
-    glScalef(1, -1, 1);
-    glRotatef(-theta, 0, 0, 1);
-    glTranslatef(0, -c, 0);
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < 11; i++)
-        glVertex2fv(house[i]);
-    glEnd();
+    drawhouse();
     glPopMatrix();
+
+
     glFlush();
 }
-void myInit() {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
-    glColor3f(1.0, 0.0, 0.0);
-    glLineWidth(2.0);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(-450, 450, -450, 450);
+
+void drawrot(){
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1,0,0);drawhouse();glFlush();
+
+    glPushMatrix();
+    glTranslatef(xr,yr,0);
+    glRotatef(t,0,0,1);
+    glTranslatef(-xr,-yr,0);
+    drawhouse();
+    glPopMatrix();
+
+    glFlush();
 }
-void mouse(int btn, int state, int x, int y) {
-    if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        display();
-    } else if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-        display2();
+void keeb (unsigned char button,  int x, int y){
+    if(button=='r'){
+        drawrot();
+    }else if(button=='f'){
+        drawrefl();
+    }else{
+        glutPostRedisplay();
     }
 }
-int main(int argc, char** argv) {
-    printf("Enter the rotation angle\n");
-    scanf("%d", &angle);
-    printf("Enter c and m value for line y=mx+c\n");
-    scanf("%f %f", &c, &m);
-    glutInit(&argc, argv);
+
+int main(int c,char**v){
+    glutInit(&c, v);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-    glutInitWindowSize(900, 900);
+    glutInitWindowSize(400, 400);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("House Rotation");
-    glutDisplayFunc(display);
-    glutMouseFunc(mouse);
-    myInit();
+    glutCreateWindow("Polygon Clipping!");
+    glutDisplayFunc(drawusual);
+    glutKeyboardFunc(keeb);
+    glMatrixMode(GL_PROJECTION);
+    gluOrtho2D(0,499,0,499);
+    glMatrixMode(GL_MODELVIEW);
+    std::cout<<"m,c";std::cin>>m>>c;
+    std::cout<<"t,xr,yr";std::cin>>t>>xr>>yr;
+
     glutMainLoop();
 }
+
+
+

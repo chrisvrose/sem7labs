@@ -32,7 +32,7 @@ void clipdraw() {
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_LINES);
     for (int i = 0; i < n; i++) {
-        float x0 = x0l[i], xn = xnl[i], y0 = y0l[i], yn = ynl[i];
+        float  x0= x0l[i], xn = xnl[i], y0 = y0l[i], yn = ynl[i];
         float dx = xn-x0,dy=yn-y0,t1=0,t2=1;
         //original
         glColor3f(0,1,1);//cyan

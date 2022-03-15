@@ -33,6 +33,7 @@
         "tuple": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "random": "cpp"
     }
 }

@@ -7,7 +7,7 @@
 using namespace std;
 typedef struct {float x;float y;} vec2;
 vector<vec2> poly;
-vector<vec2> clipper_ends;
+// vector<vec2> clipper_ends;
 
 int ymin, ymax, xmin, xmax;
 
@@ -43,6 +43,7 @@ void clip(vector<vec2> mypoly) {
             newpoints.push_back(next);
         }else if(!isFirstInside && isSecondIn){ // out->in
             // this inpoint is done the same way as cohen sutherland clips a line
+            // x = x0+dy/m
             vec2 inpoint = {current.x+(ymax-current.y)*(next.x-current.x)/(next.y-current.y),ymax};  // x0=x0+ ymax-y0 * x1-x0
             newpoints.push_back(inpoint);
             
@@ -142,11 +143,13 @@ void display() {
     glColor3f(0.0f, 1.0f, 0.0f);
     drawPoly(poly);  // original in green
     // i and k are two consecutive indexes
-    int cs = clipper_ends.size();
+    // int cs = clipper_ends.size();
 
+    // make a copy and pass it
+    vector<vec2> copyofpoly(poly);
     // We pass the current array of vertices, it's size
     // and the end points of the selected clipper line
-    clip(poly);
+    clip(copyofpoly);
     // clip(old_poly_points, poly_size, clipper_points[i][0],
     //      clipper_points[i][1], clipper_points[k][0], clipper_points[k][1]);
 

@@ -96,7 +96,10 @@ inline void myinit() {
     // move the cube a bit away
     glTranslated(0, 0, -6);
 }
-
+void res(int w, int h){
+    glViewport(0,0,w,h);
+    
+}
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_DOUBLE);
@@ -106,7 +109,7 @@ int main(int argc, char** argv) {
     glutDisplayFunc(disp);
     
     glutIdleFunc(idle);
-
+    glutReshapeFunc(res);
     // we can use vertex and color arrays and pass them to opengl
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);

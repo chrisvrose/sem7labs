@@ -13,17 +13,22 @@ void edgeDetect(int x0,int y0,int x1,int y1,int sl){
 	if(y0>y1) {
 		swap(x0,x1);swap(y0,y1);
 	}
-	if(y0==y1) return ;
 	// sl is inbetween the line's y
 	if(y0<=sl&&sl<=y1){
 		// add it to the xints for that vector
 		xint.push_back(x0+(sl-y0)*(x1-x0)/(y1-y0));
 	}
 }
-
+void displayEdge(){
+	glBegin(GL_LINE_LOOP);
+	for(int i=0;i<x.size();i++){
+		glVertex2f(x[i],y[i]);
+	}
+	glEnd();
+}
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_LINES);
+	displayEdge();
 	//foreach scanline
 	for(int sl=0;sl<500;sl++){
 		// how many lines?
@@ -43,12 +48,14 @@ void display(){
 		// then 2*i   -> first element -> 0,2,4,6
 		// then 2*i+1 -> second element -> 1,3,5,7
 		for(int i=0;i<m/2;i++){
-			glVertex2i(xint[2*i],sl);
-			glVertex2i(xint[2*i+1],sl);
+			glBegin(GL_LINES);
+				glVertex2i(xint[2*i],sl);
+				glVertex2i(xint[2*i+1],sl);
+			glEnd();
+			glFlush();
+			for(int i=0;i<1<<16;i++);
 		}
 	}
-	glEnd();
-	glFlush();
 }
 
 int main(int c, char**v){
