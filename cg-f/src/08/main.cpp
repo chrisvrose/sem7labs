@@ -1,4 +1,4 @@
-// CH
+// CS
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <iostream>
