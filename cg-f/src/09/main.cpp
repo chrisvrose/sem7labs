@@ -1,134 +1,106 @@
 #include <GL/glut.h>
-#include <stdio.h>
+#include <algorithm>
+#include <iostream>
+#include <vector>
+using namespace std;
 
-double xmin, ymin, xmax, ymax;      // 50 50 100 100
-double xvmin, yvmin, xvmax, yvmax;  // 200 200 300 300
-
-int n;
-
-struct line_segment {
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-};
-struct line_segment ls[10];
-int cliptest(double p, double q, double* u1, double* u2) {
-    double r;
-    if (p)
-        r = q / p;  // to check whether p
-    if (p < 0.0)    // potentially entry point, update te
-    {
-        if (r > *u1)
-            *u1 = r;
-        if (r > *u2)
-            return (false);  // line portion is outside
-    } else if (p > 0.0)      //  Potentially leaving point, update tl
-    {
-        if (r < *u2)
-            *u2 = r;
-        if (r < *u1)
-            return (false);  // line portion is outside
-    } else if (p == 0.0) {
-        if (q < 0.0)
-            return (false);  // line parallel to edge but outside
+bool cliptest(float p, float q, float* t1, float* t2) {
+    if (p == 0)
+        if (q < 0)
+            return false;  // parallel and out of the window
+    float r = q / p;
+    if (p < 0) {
+        if (r > *t2)
+            return false;
+        if (r > *t1)
+            *t1 = r;
     }
-    return (true);
+    if (p > 0) {
+        if (r < *t1)
+            return false;
+        if (r < *t2)
+            *t2 = r;
+    }
+    return true;
 }
+vector<float> x0l, xnl, y0l, ynl;
+float xmin = 10, xmax = 110, ymin = 10, ymax = 110;
+float xwmin = 200, xwmax = 400, ywmin = 200, ywmax = 400;
 
-void LiangBarskyLineClipAndDraw(double x0, double y0, double x1, double y1) {
-    double dx = x1 - x0, dy = y1 - y0, u1 = 0.0, u2 = 1.0;
-    // draw a red colored viewport
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_LINE_LOOP);
-    glVertex2f(xvmin, yvmin);
-    glVertex2f(xvmax, yvmin);
-    glVertex2f(xvmax, yvmax);
-    glVertex2f(xvmin, yvmax);
-    glEnd();
-    if (cliptest(-dx, x0 - xmin, &u1, &u2))     // inside test wrt left edge
-        if (cliptest(dx, xmax - x0, &u1, &u2))  // inside test wrt right edge
-            if (cliptest(-dy, y0 - ymin, &u1,
-                         &u2))  // inside test wrt bottom edge
-                if (cliptest(dy, ymax - y0, &u1,
-                             &u2))  // inside test wrt top edge
-                {
-                    if (u2 < 1.0) {
-                        x1 = x0 + u2 * dx;
-                        y1 = y0 + u2 * dy;
-                    }
-                    if (u1 > 0.0) {
-                        x0 = x0 + u1 * dx;
-                        y0 = y0 + u1 * dy;
-                    }
-                    // Window to viewport mappings
-                    double sx =
-                        (xvmax - xvmin) / (xmax - xmin);  // Scale parameters
-                    double sy = (yvmax - yvmin) / (ymax - ymin);
-                    double vx0 = xvmin + (x0 - xmin) * sx;
-                    double vy0 = yvmin + (y0 - ymin) * sy;
-                    double vx1 = xvmin + (x1 - xmin) * sx;
-                    double vy1 = yvmin + (y1 - ymin) * sy;
-
-                    glColor3f(0.0, 0.0, 1.0);  // draw blue colored clipped line
-                    glBegin(GL_LINES);
-                    glVertex2d(vx0, vy0);
-                    glVertex2d(vx1, vy1);
-                    glEnd();
-                }
-}  // end of line clipping
-
-void display() {
+void clipdraw() {
+    int n = x0l.size();
     glClear(GL_COLOR_BUFFER_BIT);
-    // draw the line with red color
-    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_LINES);
     for (int i = 0; i < n; i++) {
-        glBegin(GL_LINES);
-        glVertex2d(ls[i].x1, ls[i].y1);
-        glVertex2d(ls[i].x2, ls[i].y2);
-        glEnd();
+        float x0 = x0l[i], xn = xnl[i], y0 = y0l[i], yn = ynl[i];
+        float dx = xn-x0,dy=yn-y0,t1=0,t2=1;
+        //original
+        glColor3f(0,1,1);//cyan
+        glVertex2f(x0,y0);glVertex2f(xn,yn);
+
+        if(
+            cliptest(-dx,x0-xmin,&t1,&t2)&&//L
+            cliptest(dx,xmax-x0,&t1,&t2)&&//R
+            cliptest(-dy,y0-ymin,&t1,&t2)&&//B
+            cliptest(dy,ymax-y0,&t1,&t2)  //T
+            ){
+                // always set 1 first - otherwise if we set x0 first we lose the old x0 val
+                if(t2<1){
+                    xn=x0+t2*dx;
+                    yn=y0+t2*dy;
+                }
+                if(t1>0){
+                    x0=x0+t1*dx;
+                    y0=y0+t1*dy;
+                }
+                glColor3f(1,0,1);//magenta
+                glVertex2f((x0-xmin)*(xwmax-xwmin)/(xmax-xmin)+xwmin,(y0-ymin)*(ywmax-ywmin)/(ymax-ymin)+ywmin);
+                glVertex2f((xn-xmin)*(xwmax-xwmin)/(xmax-xmin)+xwmin,(yn-ymin)*(ywmax-ywmin)/(ymax-ymin)+ywmin);
+            }
+
     }
-    // draw a blue colored window
-    glColor3f(0.0, 0.0, 1.0);
-    glBegin(GL_LINE_LOOP);
-    glVertex2f(xmin, ymin);
-    glVertex2f(xmax, ymin);
-    glVertex2f(xmax, ymax);
-    glVertex2f(xmin, ymax);
     glEnd();
-    for (int i = 0; i < n; i++)
-        LiangBarskyLineClipAndDraw(ls[i].x1, ls[i].y1, ls[i].x2, ls[i].y2);
-    glFlush();
+
+    //original
+    glBegin(GL_LINE_LOOP);glColor3f(1,0,0);
+        glVertex2f(xmin,ymin);
+        glVertex2f(xmax,ymin);
+        glVertex2f(xmax,ymax);
+        glVertex2f(xmin,ymax);
+    glEnd();
+    // viewport
+    glBegin(GL_LINE_LOOP);glColor3f(1,1,0);//yellow
+        glVertex2f(xwmin,ywmin);
+        glVertex2f(xwmax,ywmin);
+        glVertex2f(xwmax,ywmax);
+        glVertex2f(xwmin,ywmax);
+    glEnd();glFlush();
 }
 
-void myinit() {
-    glClearColor(1.0, 1.0, 1.0, 1.0);
-    glColor3f(1.0, 0.0, 0.0);
-    glLineWidth(2.0);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0.0, 499.0, 0.0, 499.0);
-}
+int main(int c,char**v){
+    glutInit(&c,v);
+	cout << "Enter #verts\n";
+	int n;
+	cin >> n;
+	cout << "Enter lines\n";
+	float temp;
+	for (int i = 0; i < n; i++) {
+        cout<<"x0";cin>>temp;x0l.push_back(temp);
+        cout<<"y0";cin>>temp;y0l.push_back(temp);
+        cout<<"xn";cin>>temp;xnl.push_back(temp);
+        cout<<"yn";cin>>temp;ynl.push_back(temp);
+	}
 
-int main(int argc, char** argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-    glutInitWindowSize(500, 500);
-    glutInitWindowPosition(0, 0);
+	glutInitDisplayMode(GLUT_RGB);
+	glutInitWindowSize(500, 500);
 
-    printf("Enter window coordinates: (xmin ymin xmax ymax) \n");
-    scanf("%lf%lf%lf%lf", &xmin, &ymin, &xmax, &ymax);
-    printf("Enter viewport coordinates: (xvmin yvmin xvmax yvmax) \n");
-    scanf("%lf%lf%lf%lf", &xvmin, &yvmin, &xvmax, &yvmax);
-    printf("Enter no. of lines:\n");
-    scanf("%d", &n);
+	glutCreateWindow("");
 
-    for (int i = 0; i < n; i++) {
-        printf("Enter coordinates: (x1 y1 x2 y2)\n");
-        scanf("%d%d%d%d", &ls[i].x1, &ls[i].y1, &ls[i].x2, &ls[i].y2);
-    }
-    glutCreateWindow("Liang Barsky Line Clipping Algorithm");
-    glutDisplayFunc(display);
-    myinit();
-    glutMainLoop();
+	glutDisplayFunc(clipdraw);
+	glClearColor(0,0,0,1);
+	
+	glMatrixMode(GL_PROJECTION);
+	gluOrtho2D(0, 499, 0, 499);
+	glutMainLoop();
+	return 0;
 }
