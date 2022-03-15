@@ -53,7 +53,7 @@ void display(){
 				glVertex2i(xint[2*i+1],sl);
 			glEnd();
 			glFlush();
-			for(int i=0;i<1<<16;i++);
+			for(int i=0;i<1<<24;i++){i++;};
 		}
 	}
 }
