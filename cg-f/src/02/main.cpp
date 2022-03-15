@@ -17,7 +17,7 @@ void pts(int h,int k,int x,int y){
     glVertex2i(h+y,k-x);
 }
 void circ(int x0,int y0,int r){
-    int x=0,y=r,p=3-4*r;
+    int x=0,y=r,p=3-2*r;
     glBegin(GL_POINTS);
     pts(x0,y0,x,y);
 
