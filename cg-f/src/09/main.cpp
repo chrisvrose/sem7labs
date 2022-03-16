@@ -5,9 +5,12 @@
 using namespace std;
 
 bool cliptest(float p, float q, float* t1, float* t2) {
-    if (p == 0)
+    if (p == 0){
         if (q < 0)
             return false;  // parallel and out of the window
+        else
+            return true;
+    }
     float r = q / p;
     if (p < 0) {
         if (r > *t2)

@@ -14,7 +14,7 @@ void edgeDetect(int x0,int y0,int x1,int y1,int sl){
 		swap(x0,x1);swap(y0,y1);
 	}
 	// sl is inbetween the line's y
-	if(y0<=sl&&sl<=y1){
+	if(y0<sl&&sl<y1){
 		// add it to the xints for that vector
 		xint.push_back(x0+(sl-y0)*(x1-x0)/(y1-y0));
 	}
