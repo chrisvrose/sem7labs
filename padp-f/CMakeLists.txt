@@ -12,6 +12,7 @@ add_executable(20 src/20/main.cpp)
 
 
 add_executable(30 src/30/main.cpp)
+add_executable(30o src/30/old.cpp)
 
 add_executable(60 src/60/main.cpp)
 

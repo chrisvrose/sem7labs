@@ -1,146 +1,120 @@
-// Bhanu Prakash
-// 1RV18CS039
-
 #include <math.h>
 #include <omp.h>
 #include <string.h>
 #include <iostream>
 #include <vector>
 using namespace std;
-double t = 0.0;
 
 inline long Strike(vector<bool>& composite, long i, long stride, long limit) {
-    for (; i <= limit; i += stride)
+    for (; i <= limit; i += stride) {
         composite[i] = true;
+    }
     return i;
 }
 
-long CacheUnfriendlySieve(long n) {
+long CNE(long n) {
+    long m = sqrt(n);
     long count = 0;
-    long m = (long)sqrt((double)n);
-    // bool* composite = new bool[n + 1];
     vector<bool> composite(n + 1, false);
 
-    // memset(composite, 0, n);
-
-    t = omp_get_wtime();
-
-    for (long i = 2; i <= m; ++i)
+    for (long i = 2; i <= m; i++) {
         if (!composite[i]) {
-            ++count;
-            // Strike walks array ofsize n here.
+            count++;
             Strike(composite, 2 * i, i, n);
         }
+    }
 
-    for (long i = m + 1; i <= n; ++i)
-        if (!composite[i]) {
-            ++count;
-        }
-    t = omp_get_wtime() - t;
-
-    // delete[] composite;
-
+    for (long i = m + 1; i <= n; i++) {
+        if (!composite[i])
+            count++;
+    }
     return count;
 }
 
-long CacheFriendlySieve(long n) {
-    long count = 0;
-    long m = (long)sqrt((double)n);
-    // bool* composite = new bool[n + 1];
+long CFE(long n) {
+    long count = 0, m = (long)sqrt(n);
     vector<bool> composite(n + 1, false);
+    vector<long> factor, striker;
 
-    vector<long> striker;
-    vector<long> factor;
-
-    long n_factor = 0;
-
-    t = omp_get_wtime();
-    for (long i = 2; i <= m; ++i)
+    for (int i = 2; i <= m; i++) {
         if (!composite[i]) {
-            ++count;
+            count++;
             striker.push_back(Strike(composite, 2 * i, i, m));
             factor.push_back(i);
         }
-    // Chops sieve into windows of size ≈ sqrt(n)
-    for (long window = m + 1; window <= n; window += m) {
-        long limit = min(window + m - 1, n);
-        for (long k = 0; k < n_factor; ++k)
-            // Strike walks window of size sqrt(n) here.
-            striker[k] = Strike(composite, striker[k], factor[k], limit);
-        for (long i = window; i <= limit; ++i)
-            if (!composite[i])
-                ++count;
     }
 
-    t = omp_get_wtime() - t;
-    // delete[] striker;
-    // delete[] factor;
-    // delete[] composite;
+    for (long w = m + 1; w <= n; w += m) {
+        long limit = min(w + m - 1, n);
+        for (int i = 0; i < factor.size(); i++) {
+            striker[i] = Strike(composite, striker[i], factor[i], limit);
+        }
+
+        for (long i = w; i <= limit; i++) {
+            if (!composite[i])
+                count++;
+        }
+    }
+
     return count;
 }
 
-long ParallelSieve(long n) {
-    long count = 0;
-    long m = (long)sqrt((double)n);
-    // long n_factor = 0;
+long CPE(long n) {
+    long count = 0, m = (long)sqrt(n);
+
     vector<long> factor;
-    t = omp_get_wtime();
-    // serial portion -> compute till sqrt(n), setting up the factors
+
     {
         vector<bool> composite(m + 1, false);
-
-        for (long i = 2; i <= m; ++i)
+        for (int i = 2; i <= m; i++) {
             if (!composite[i]) {
-                ++count;
+                count++;
                 Strike(composite, 2 * i, i, m);
                 factor.push_back(i);
             }
+        }
     }
+
+// now the painful parallel part
 #pragma omp parallel
     {
         vector<bool> composite(m + 1, false);
-        vector<long> striker(m, 0);
-        // this is the base to start from, and also if -1, means that strikers must be populated (something this impl doesnt do immediately)
+        vector<long> striker;
         long base = -1;
+
 #pragma omp for reduction(+ : count)
-        for (long window = m + 1; window <= n; window += m) {
-            composite.assign(m + 1, false);
-            long n_factor = factor.size();
-            if (base != window) {
-                // Must compute striker from scratch.
-                base = window;
-                for (long k = 0; k < n_factor; ++k)
-                    striker[k] =
-                        (base + factor[k] - 1) / factor[k] * factor[k] - base;
+        for (long w = m + 1; w < n; w += m) {
+            //reset composite
+            composite.assign(m+1,false);
+            long limit=min(w+m-1,n)-w;
+            if(base!=w){
+                //compute striker
+                for(auto f:factor){
+                    striker.push_back((f+w-1)/f*f   -w);
+                }
             }
-            long limit = min(window + m - 1, n) - base;
-            for (long k = 0; k < n_factor; ++k)
-                striker[k] =
-                    Strike(composite, striker[k], factor[k], limit) - m;
-            for (long i = 0; i <= limit; ++i)
-                if (!composite[i])
-                    ++count;
-            base += m;
+
+            //now that we have strikers proceed
+            for(long i=0;i<factor.size();i++){
+                striker[i] = Strike(composite,striker[i],factor[i],limit)-m;
+            }
+            for(long i=0;i<=limit;i++){
+                if(!composite[i]) count++;
+            }
+
+
+            base+=m;
         }
     }
-    t = omp_get_wtime() - t;
-    // delete[] factor;
+
     return count;
 }
 
 int main() {
-    for (long i = 100000000; i >= 1000000; i /= 10) {
-        cout << "Input Size\t" << i << endl;
-        long count1 = CacheUnfriendlySieve(i);
-        cout << "Unfriendly\t" << count1 << "\t";
-        cout << "Time:\t" << t << endl;
+    cout << 5761455 << endl;
+    cout<<CNE(100000000)<<endl;
+    cout << CFE(100000000) << endl;
+    cout << CPE(100000000) << endl;
 
-        long count2 = CacheFriendlySieve(i);
-        cout << "Friendly\t" << count2 << "\t";
-        cout << "Time:\t" << t << endl;
-
-        long count3 = ParallelSieve(i);
-        cout << "Parallel\t" << count3 << "\t";
-        cout << "Time:\t" << t << endl;
-    }
+    return 0;
 }
