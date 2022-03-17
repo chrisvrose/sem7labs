@@ -5,10 +5,11 @@
 #include <omp.h>
 #include <string.h>
 #include <iostream>
+#include <vector>
 using namespace std;
 double t = 0.0;
 
-inline long Strike(bool composite[], long i, long stride, long limit) {
+inline long Strike(vector<bool>& composite, long i, long stride, long limit) {
     for (; i <= limit; i += stride)
         composite[i] = true;
     return i;
@@ -17,9 +18,10 @@ inline long Strike(bool composite[], long i, long stride, long limit) {
 long CacheUnfriendlySieve(long n) {
     long count = 0;
     long m = (long)sqrt((double)n);
-    bool* composite = new bool[n + 1];
+    // bool* composite = new bool[n + 1];
+    vector<bool> composite(n + 1, false);
 
-    memset(composite, 0, n);
+    // memset(composite, 0, n);
 
     t = omp_get_wtime();
 
@@ -36,7 +38,7 @@ long CacheUnfriendlySieve(long n) {
         }
     t = omp_get_wtime() - t;
 
-    delete[] composite;
+    // delete[] composite;
 
     return count;
 }
@@ -44,18 +46,20 @@ long CacheUnfriendlySieve(long n) {
 long CacheFriendlySieve(long n) {
     long count = 0;
     long m = (long)sqrt((double)n);
-    bool* composite = new bool[n + 1];
-    memset(composite, 0, n);
-    long* factor = new long[m];
-    long* striker = new long[m];
+    // bool* composite = new bool[n + 1];
+    vector<bool> composite(n + 1, false);
+
+    vector<long> striker;
+    vector<long> factor;
+
     long n_factor = 0;
 
     t = omp_get_wtime();
     for (long i = 2; i <= m; ++i)
         if (!composite[i]) {
             ++count;
-            striker[n_factor] = Strike(composite, 2 * i, i, m);
-            factor[n_factor++] = i;
+            striker.push_back(Strike(composite, 2 * i, i, m));
+            factor.push_back(i);
         }
     // Chops sieve into windows of size ≈ sqrt(n)
     for (long window = m + 1; window <= n; window += m) {
@@ -69,39 +73,39 @@ long CacheFriendlySieve(long n) {
     }
 
     t = omp_get_wtime() - t;
-    delete[] striker;
-    delete[] factor;
-    delete[] composite;
+    // delete[] striker;
+    // delete[] factor;
+    // delete[] composite;
     return count;
 }
 
 long ParallelSieve(long n) {
     long count = 0;
     long m = (long)sqrt((double)n);
-    long n_factor = 0;
-    // long* factor = new long[m];
-    long factor[m];
+    // long n_factor = 0;
+    vector<long> factor;
     t = omp_get_wtime();
+    // serial portion -> compute till sqrt(n), setting up the factors
+    {
+        vector<bool> composite(m + 1, false);
+
+        for (long i = 2; i <= m; ++i)
+            if (!composite[i]) {
+                ++count;
+                Strike(composite, 2 * i, i, m);
+                factor.push_back(i);
+            }
+    }
 #pragma omp parallel
     {
-        bool composite[m+1];
-        long striker[m];
-        // bool* composite = new bool[m + 1];
-        // long* striker = new long[m];
-#pragma omp single
-        {
-            memset(composite, 0, m);
-            for (long i = 2; i <= m; ++i)
-                if (!composite[i]) {
-                    ++count;
-                    Strike(composite, 2 * i, i, m);
-                    factor[n_factor++] = i;
-                }
-        }
+        vector<bool> composite(m + 1, false);
+        vector<long> striker(m, 0);
+        // this is the base to start from, and also if -1, means that strikers must be populated (something this impl doesnt do immediately)
         long base = -1;
 #pragma omp for reduction(+ : count)
         for (long window = m + 1; window <= n; window += m) {
-            memset(composite, 0, m);
+            composite.assign(m + 1, false);
+            long n_factor = factor.size();
             if (base != window) {
                 // Must compute striker from scratch.
                 base = window;
@@ -118,8 +122,6 @@ long ParallelSieve(long n) {
                     ++count;
             base += m;
         }
-        // delete[] striker;
-        // delete[] composite;
     }
     t = omp_get_wtime() - t;
     // delete[] factor;

@@ -32,7 +32,7 @@ project(sem7padp_ocl VERSION 0.1.0)
 find_package(OpenCL REQUIRED)
 link_directories(${OpenCL_LIBRARY})
 
-add_executable (70 src/70/ocl.cpp)
+add_executable (70 src/70/main.cpp)
 target_link_libraries (70 ${OpenCL_LIBRARY})
 
 
