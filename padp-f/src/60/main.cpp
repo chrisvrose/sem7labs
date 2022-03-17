@@ -1,6 +1,7 @@
 #include <omp.h>
 #include <cstring>
 #include <iostream>
+#include<fstream>
 #include <string>
 #include <vector>
 using namespace std;
@@ -13,27 +14,13 @@ int compare(string a, string b, bool ignorecase) {
 }
 
 int get_count(string word, bool ignorecase) {
-    FILE* fp = fopen(FN, "r");
-    if (fp == nullptr)
-        return 0;
-    char c;
     int count=0;
+    ifstream f(FN);
 
-    while (!feof(fp)) {
-        string gotword = "";
-        // skip garbage
-        while ((c = fgetc(fp)) != EOF and !isalpha(c))
-            ;
-
-        while (c != EOF and isalpha(c)) {
-            gotword += c;
-            c = fgetc(fp);
-        }
-        //we have a gotword
+    string gotword;
+    while(f>>gotword){
         if(compare(gotword,word,true)==0) count++;
     }
-
-    fclose(fp);
     return count;
 }
 

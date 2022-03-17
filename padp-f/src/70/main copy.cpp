@@ -49,29 +49,29 @@ int main(int argc,char** argv)
     clstat = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, num_devices, device_list, NULL);
 
     // Create one OpenCL context for each device in the platform
-    cl_context context = clCreateContext(NULL, num_devices, device_list, NULL, NULL, &clstat);
+    cl_context context = clCreateContext(NULL, num_devices, device_list, NULL, NULL, NULL);
 
     // Create a command queue
 
-    cl_command_queue cmd_queue = clCreateCommandQueueWithProperties(context, device_list[0], NULL, &clstat);
+    cl_command_queue cmd_queue = clCreateCommandQueueWithProperties(context, device_list[0], NULL, NULL);
 
     // Create memory buffers on the device for each vector
-    cl_mem A_clmem = clCreateBuffer(context, CL_MEM_READ_ONLY, VECTOR_SIZE * sizeof(float), NULL, &clstat);
-    cl_mem B_clmem = clCreateBuffer(context, CL_MEM_READ_ONLY, VECTOR_SIZE * sizeof(float), NULL, &clstat);
-    cl_mem C_clmem = clCreateBuffer(context, CL_MEM_WRITE_ONLY, VECTOR_SIZE * sizeof(float),NULL,&clstat);
+    cl_mem A_clmem = clCreateBuffer(context, CL_MEM_READ_ONLY, VECTOR_SIZE * sizeof(float), NULL, NULL);
+    cl_mem B_clmem = clCreateBuffer(context, CL_MEM_READ_ONLY, VECTOR_SIZE * sizeof(float), NULL, NULL);
+    cl_mem C_clmem = clCreateBuffer(context, CL_MEM_WRITE_ONLY, VECTOR_SIZE * sizeof(float),NULL,NULL);
 
     // Copy the Buffer A and B to the device
     clstat = clEnqueueWriteBuffer(cmd_queue, A_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), A, 0, NULL, NULL);
     clstat = clEnqueueWriteBuffer(cmd_queue, B_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), B, 0, NULL, NULL);
-    
+
     // Create a program from the kernel source
-    cl_program prg = clCreateProgramWithSource(context, 1, (const char**)&saxpy_kernel, NULL, &clstat);
+    cl_program prg = clCreateProgramWithSource(context, 1, (const char**)&saxpy_kernel, NULL, NULL);
 
     // Build the program
     clstat = clBuildProgram(prg, 1, device_list, NULL, NULL,NULL);
 
     // Create the OpenCL kernel
-    cl_kernel kernel = clCreateKernel(prg, "saxpy_kernel", &clstat);
+    cl_kernel kernel = clCreateKernel(prg, "saxpy_kernel", NULL);
 
     // Set the arguments of the kernel
     clstat = clSetKernelArg(kernel, 0, sizeof(float), (void*)&alpha);
@@ -83,7 +83,7 @@ int main(int argc,char** argv)
     size_t global_size = VECTOR_SIZE; // Process the entire lists
     // size_t local_size = 64; // Process one item at a time
     // cl_event event; // event listener
-    clstat = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, 0, &global_size, &local_size, 0, NULL, NULL);
+    clstat = clEnqueueNDRangeKernel(cmd_queue, kernel, 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
     // Read the cl memory C_clmem on device to the host variable C
     clstat = clEnqueueReadBuffer(cmd_queue, C_clmem, CL_TRUE, 0, VECTOR_SIZE * sizeof(float), C, 0, NULL, NULL);
